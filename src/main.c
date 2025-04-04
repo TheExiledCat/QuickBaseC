@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "argparse.h"
 typedef struct command {
@@ -15,9 +16,11 @@ typedef struct command {
 } command;
 int Serve(int argc, const char **argv);
 int Tui(int argc, const char **argv);
-static const char *usages[] = {"command [options]", "serve -p <PORT>", "tui",
-                               NULL};
-static command commands[] = {{"serve", Serve}, {"tui", Tui}};
+int Initialize(int argc, const char **argv);
+static const char *usages[] = {"command [options]", "init [-o <output>]",
+                               "serve -p <PORT>", "tui", NULL};
+static command commands[] = {
+    {"init", Initialize}, {"serve", Serve}, {"tui", Tui}};
 int main(int argc, const char *argv[]) {
   struct argparse argp;
   struct argparse_option basicOptions[] = {OPT_HELP(), OPT_END()};
@@ -32,22 +35,31 @@ int main(int argc, const char *argv[]) {
 
     if (!strcmp(commands[i].name, argv[0])) {
       cmd = &commands[i];
+      if (cmd) {
+        return cmd->action(argc, argv);
+      }
     }
   }
-  if (cmd) {
-    return cmd->action(argc, argv);
-  } else {
-    return -1;
-  }
-  // Schema *schema = DefaultSchema();
-  // const char *json;
-  // ConvertSchema(schema, &json);
-  // Init(schema);
 
   return 0;
 }
 int Tui(int argc, const char *argv[]) { return 0; }
 int Serve(int argc, const char *argv[]) {
   printf("Hello World");
+  return 0;
+}
+int Initialize(int argc, const char **argv) {
+
+  char *path = strdup("schemes");
+  DIR *dir = opendir(path);
+  Schema *schema;
+  if (dir == NULL) {
+    printf("creating schemes directory\n");
+    mkdir(path, 0700);
+    schema = DefaultSchema();
+    WriteSchema(schema, path);
+  }
+  printf("Ensuring database exists\n");
+  Init(schema);
   return 0;
 }

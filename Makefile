@@ -38,4 +38,5 @@ $(OBJ_DIR):
 # Clean rule to remove compiled files
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
-
+init:
+	rm -rf "data" "schemes"

@@ -5,9 +5,9 @@ typedef struct Settings {
 } Settings;
 typedef struct Schema {
   int entityCount;
-  char* version;
+  char *version;
   Settings settings;
-  Entity* entities[];
+  Entity *entities[];
 } Schema;
 
-Schema* DefaultSchema();
+Schema *DefaultSchema();

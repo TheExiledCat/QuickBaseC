@@ -123,3 +123,29 @@ bool HandleDateField(json_object *fieldObject, EntityField *field) {
   json_object_object_add(fieldObject, "maxDate", maxDateObject);
   return true;
 }
+
+void WriteSchema(Schema *schema, char *dir) {
+
+  {
+
+    char name[256 * 2];
+    strcpy(name, dir);
+    strcat(name, strdup("/"));
+    struct tm *date;
+    time_t t;
+    time(&t);
+    date = localtime(&t);
+    char datestring[256 - strlen(dir)];
+    strftime(datestring, 256, "%Y-%m-%dT%H:%M:%SZ", date);
+    strcat(name, strdup(datestring));
+
+    strcat(name, strdup(".json"));
+    FILE *file;
+    if ((file = fopen(name, "w")) != NULL) {
+      fprintf(file, "%s", json);
+      fclose(file);
+    } else {
+      printf("Could not open scheme file %s\n", name);
+    }
+  }
+}
