@@ -127,7 +127,8 @@ bool HandleDateField(json_object *fieldObject, EntityField *field) {
 void WriteSchema(Schema *schema, char *dir) {
 
   {
-
+    const char *json;
+    ConvertSchema(schema, &json);
     char name[256 * 2];
     strcpy(name, dir);
     strcat(name, strdup("/"));
