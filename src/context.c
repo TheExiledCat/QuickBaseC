@@ -71,20 +71,33 @@ bool GetTableQuery(Entity *entity, sqlite3_stmt **stmt) {
 }
 char *GetFieldQuery(EntityField *field) { return ""; }
 char *EntityTypeToSQLITE(EntityField *field) {
+  char *type = malloc(255);
   switch (field->type) {
 
   case FIELD_TEXT:
   case FIELD_DATE:
-    return "TEXT";
-
+    strcat(type, "TEXT");
+    break;
   case FIELD_NUMBER: {
     NumberField *numField = (NumberField *)field;
-    return numField->isFloat ? "REAL" : "INTEGER";
+    strcat(type, numField->isFloat ? "REAL" : "INTEGER");
+    break;
   }
 
   case FIELD_RELATION:
-    return "INTEGER";
+    strcat(type, "INTEGER");
+    break;
   case FIELD_BOOL:
-    return "INTEGER";
+    strcat(type, "INTEGER");
+    break;
   }
+  if (strcmp(field->name, "id") == 0) {
+    strcat(type, " PRIMARY KEY");
+  }
+  if (!field->nullable) {
+    strcat(type, " NOT NULL");
+  }
+
+  return type;
 }
+int MigrateField(MigrationType type, Schema *newSchema) { return 0; }

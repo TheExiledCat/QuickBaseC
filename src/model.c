@@ -13,10 +13,10 @@ bool NewEntity(char *name, EntityType type, Entity **outEntity) {
   TextField *idField = NULL;
   DateField *createdField = NULL;
   DateField *updatedField = NULL;
-  NewTextField("id", false, 15, 15, "^[a-z0-9]+$", "[a-z0-9]{15}", true,
+  NewTextField("id", false, true, 15, 15, "^[a-z0-9]+$", "[a-z0-9]{15}",
                &idField);
-  NewDateField("created", false, NULL, NULL, true, &createdField);
-  NewDateField("updated", false, NULL, NULL, true, &updatedField);
+  NewDateField("created", false, true, NULL, NULL, &createdField);
+  NewDateField("updated", false, true, NULL, NULL, &updatedField);
   entity->fieldCount = 0;
   AddField(&entity, (EntityField *)idField);
   AddField(&entity, (EntityField *)createdField);
@@ -37,9 +37,9 @@ bool NewEntity(char *name, EntityType type, Entity **outEntity) {
   *outEntity = entity;
   return true;
 }
-bool NewTextField(char *name, bool nullable, unsigned int minLength,
-                  unsigned int maxLength, char *validationPattern,
-                  char *generationPattern, bool base, TextField **outField) {
+bool NewTextField(base_fields, unsigned int minLength, unsigned int maxLength,
+                  char *validationPattern, char *generationPattern,
+                  TextField **outField) {
   TextField *field = malloc(sizeof(TextField));
   field->field.base = base;
   field->field.name = name;
@@ -52,8 +52,17 @@ bool NewTextField(char *name, bool nullable, unsigned int minLength,
   *outField = field;
   return true;
 }
+bool ContainsField(Entity *entity, char *name) {
+  for (int i = 0; i < entity->fieldCount; i++) {
+    EntityField *field = entity->fields[i];
+    if (strcmp(field->name, name) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
 void AddField(Entity **entity, EntityField *field) {
-  if (entity == NULL || field == NULL) {
+  if (entity == NULL || field == NULL || ContainsField(*entity, field->name)) {
     printf("entity or field is null\n");
     return;
   }
@@ -76,8 +85,8 @@ void AddField(Entity **entity, EntityField *field) {
   free(old);
 }
 
-bool NewDateField(char *name, bool nullable, dateTime *minDate,
-                  dateTime *maxDate, bool base, DateField **outField) {
+bool NewDateField(base_fields, dateTime *minDate, dateTime *maxDate,
+                  DateField **outField) {
 
   DateField *field = malloc(sizeof(DateField));
   field->field.base = base;
@@ -98,8 +107,8 @@ bool NewDateField(char *name, bool nullable, dateTime *minDate,
   return true;
 }
 
-bool NewNumberField(char *name, bool nullable, double min, double max,
-                    bool isFloat, bool base, NumberField **outField) {
+bool NewNumberField(base_fields, double min, double max, bool isFloat,
+                    NumberField **outField) {
 
   NumberField *field = malloc(sizeof(NumberField));
   field->field.base = base;
@@ -114,6 +123,17 @@ bool NewNumberField(char *name, bool nullable, double min, double max,
     field->minInt = min;
     field->maxInt = max;
   }
+  *outField = field;
+  return true;
+}
+bool NewBoolField(base_fields, BoolField **outField) {
+
+  BoolField *field = malloc(sizeof(BoolField));
+
+  field->field.base = base;
+  field->field.name = name;
+  field->field.nullable = nullable;
+  field->field.type = FIELD_BOOL;
   *outField = field;
   return true;
 }

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
+// base types
 typedef struct tm dateTime;
 typedef enum FieldType {
   FIELD_TEXT,
@@ -15,12 +16,14 @@ typedef enum EntityType {
   ENTITY_DATA,
   ENTITY_COMPUTED
 } EntityType;
+// field parent
 typedef struct EntityField {
   FieldType type;
   char *name;
   bool nullable;
   bool base;
 } EntityField;
+// field children
 typedef struct TextField {
   EntityField field;
   unsigned int minLength;
@@ -47,6 +50,11 @@ typedef struct NumberField {
     double maxFloat;
   };
 } NumberField;
+typedef struct BoolField {
+  EntityField field;
+
+} BoolField;
+// Entity itself
 typedef struct Entity {
   char *name;
   EntityType type;
@@ -54,13 +62,16 @@ typedef struct Entity {
   EntityField *fields[];
 } Entity;
 
+#define base_fields char *name, bool nullable, bool base
+// constructors and extra functions
 bool NewEntity(char *name, EntityType type, Entity **outEntity);
-bool NewTextField(char *name, bool nullable, unsigned int minLength,
-                  unsigned int maxLength, char *validationPattern,
-                  char *generationPattern, bool base, TextField **outField);
+bool NewTextField(base_fields, unsigned int minLength, unsigned int maxLength,
+                  char *validationPattern, char *generationPattern,
+                  TextField **outField);
 
-bool NewDateField(char *name, bool nullable, dateTime *minDate,
-                  dateTime *maxDate, bool base, DateField **outField);
-bool NewNumberField(char *name, bool nullable, double min, double max,
-                    bool isFloat, bool base, NumberField **outField);
+bool NewDateField(base_fields, dateTime *minDate, dateTime *maxDate,
+                  DateField **outField);
+bool NewNumberField(base_fields, double min, double max, bool isFloat,
+                    NumberField **outField);
+bool NewBoolField(base_fields, BoolField **outField);
 void AddField(Entity **entity, EntityField *field);

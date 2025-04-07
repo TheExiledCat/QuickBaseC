@@ -17,6 +17,7 @@ typedef struct command {
 int Serve(int argc, const char **argv);
 int Tui(int argc, const char **argv);
 int Initialize(int argc, const char **argv);
+
 static const char *usages[] = {"command [options]", "init [-o <output>]",
                                "serve -p <PORT>", "tui", NULL};
 static command commands[] = {
